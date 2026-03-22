@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Задание 2 - HTTP запросы к веб-серверу</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .task-card {
+            background: white;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: transform 0.3s ease;
+        }
+        
+        .task-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .task-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            cursor: pointer;
+        }
+        
+        .task-header h2 {
+            margin: 0;
+            display: inline-block;
+            font-size: 1.2rem;
+        }
+        
+        .task-number {
+            background: rgba(255,255,255,0.3);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-weight: bold;
+        }
+        
+        .toggle-icon {
+            float: right;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        
+        .task-content {
+            padding: 0;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-out;
+        }
+        
+        .task-content.active {
+            max-height: 2000px;
+            padding: 20px;
+        }
+        
+        .explanation {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+        
+        .explanation h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+        
+        .request-box {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            margin: 15px 0;
+            overflow-x: auto;
+        }
+        
+        .response-info {
+            background: #e6f7ff;
+            border-left: 4px solid #1890ff;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+        }
+        
+        .response-info h4 {
+            color: #1890ff;
+            margin-bottom: 10px;
+        }
+        
+        .screenshot {
+            margin: 20px 0;
+            text-align: center;
+        }
+        
+        .screenshot img {
+            max-width: 100%;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            border: 1px solid #ddd;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+        
+        .screenshot img:hover {
+            transform: scale(1.02);
+        }
+        
+        .what-to-see {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+        }
+        
+        .what-to-see h4 {
+            color: #856404;
+            margin-bottom: 10px;
+        }
+        
+        .result-badge {
+            display: inline-block;
+            background: #28a745;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            margin-left: 10px;
+        }
+        
+        footer {
+            text-align: center;
+            color: white;
+            margin-top: 40px;
+            padding: 20px;
+        }
+        
+        @media (max-width: 768px) {
+            .task-header h2 {
+                font-size: 14px;
+            }
+            
+            .task-number {
+                width: 30px;
+                height: 30px;
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📡 Задание 2: HTTP запросы к веб-серверу</h1>
+        <h1 style="font-size: 1.2rem; margin-top: -20px;">Выполнил: u82591</h1>
+        
+        <!-- Задание 1 -->
+        <div class="task-card">
+            <div class="task-header" onclick="toggleTask(1)">
+                <h2>
+                    <span class="task-number">1</span>
+                    GET главной страницы методом GET в протоколе HTTP 1.0
+                    <span class="result-badge">✅ 200 OK</span>
+                </h2>
+                <span class="toggle-icon" id="icon1">▼</span>
+            </div>
+            <div class="task-content" id="content1">
+                <div class="explanation">
+                    <h3>📖 Что нужно сделать?</h3>
+                    <p>Выполнить GET-запрос к главной странице сервера с использованием протокола <strong>HTTP 1.0</strong>. Этот протокол не поддерживает постоянные соединения — после каждого запроса соединение закрывается.</p>
+                </div>
+                
+                <div class="request-box">
+                    <strong>🔧 Отправленный запрос:</strong><br>
+                    GET / HTTP/1.0<br>
+                    Host: u82591.kubsu-dev.ru<br>
+                    <br>
+                    (пустая строка в конце)
+                </div>
+                
+                <div class="response-info">
+                    <h4>📌 Полученный результат:</h4>
+                    <ul>
+                        <li><strong>HTTP/1.1 200 OK</strong> — успешный запрос</li>
+                        <li><strong>Content-Type: text/html; charset=UTF-8</strong></li>
+                        <li><strong>Content-Length: 335</strong> — размер страницы</li>
+                        <li>Сервер вернул HTML код с PHP ошибкой (в задании это не требуется исправлять)</li>
+                    </ul>
+                </div>
+                
+                <div class="screenshot">
+                    <h3>📸 Скриншот выполнения:</h3>
+                    <img src="screenshots/one.png" alt="Запрос 1 - GET HTTP 1.0" onclick="openModal(this.src)">
+                </div>
+            </div>
+        </div>
+        
+        <!-- Задание 2 -->
+        <div class="task-card">
+            <div class="task-header" onclick="toggleTask(2)">
+                <h2>
+                    <span class="task-number">2</span>
+                    GET внутренней страницы методом GET в протоколе HTTP 1.1
+                    <span class="result-badge">✅ 200 OK</span>
+                </h2>
+                <span class="toggle-icon" id="icon2">▼</span>
+            </div>
+            <div class="task-content" id="content2">
+                <div class="explanation">
+                    <h3>📖 Что нужно сделать?</h3>
+                    <p>Выполнить GET-запрос к внутренней странице <strong>/task2/</strong> с использованием протокола <strong>HTTP 1.1</strong>. В отличие от HTTP 1.0, этот протокол поддерживает постоянные соединения.</p>
+                </div>
+                
+                <div class="request-box">
+                    <strong>🔧 Отправленный запрос:</strong><br>
+                    GET /task2/ HTTP/1.1<br>
+                    Host: u82591.kubsu-dev.ru<br>
+                    Connection: close<br>
+                    <br>
+                    (пустая строка в конце)
+                </div>
+                
+                <div class="response-info">
+                    <h4>📌 Полученный результат:</h4>
+                    <ul>
+                        <li><strong>HTTP/1.1 200 OK</strong> — успешный запрос</li>
+                        <li>Сервер вернул индексную страницу директории /task2/</li>
+                        <li>Видна директория <strong>files/</strong> и файлы внутри</li>
+                    </ul>
+                </div>
+                
+                <div class="screenshot">
+                    <h3>📸 Скриншот выполнения:</h3>
+                    <img src="screenshots/two.png" alt="Запрос 2 - GET HTTP 1.1" onclick="openModal(this.src)">
+                </div>
+            </div>
+        </div>
+        
+        <!-- Задание 3 -->
+        <div class="task-card">
+            <div class="task-header" onclick="toggleTask(3)">
+                <h2>
+                    <span class="task-number">3</span>
+                    Определить размер файла file.tar.gz, не скачивая его
+                    <span class="result-badge">✅ 1,048,576 байт</span>
+                </h2>
+                <span class="toggle-icon" id="icon3">▼</span>
+            </div>
+            <div class="task-content" id="content3">
+                <div class="explanation">
+                    <h3>📖 Что нужно сделать?</h3>
+                    <p>Использовать метод <strong>HEAD</strong> вместо GET. HEAD запрашивает только заголовки ответа без тела, что позволяет получить метаинформацию о файле без его загрузки.</p>
+                </div>
+                
+                <div class="request-box">
+                    <strong>🔧 Отправленный запрос:</strong><br>
+                    HEAD /task2/files/file.tar.gz HTTP/1.1<br>
+                    Host: u82591.kubsu-dev.ru<br>
+                    Connection: close<br>
+                    <br>
+                    (пустая строка в конце)
+                </div>
+                
+                <div class="response-info">
+                    <h4>📌 Полученный результат:</h4>
+                    <ul>
+                        <li><strong>HTTP/1.1 200 OK</strong> — файл существует</li>
+                        <li><strong>Content-Length: 1048576</strong> — размер файла (1 МБ = 1,048,576 байт)</li>
+                        <li><strong>Content-Type: application/x-gzip</strong> — тип файла</li>
+                        <li>Тело ответа отсутствует (файл не скачан)</li>
+                    </ul>
+                </div>
+                
+                <div class="screenshot">
+                    <h3>📸 Скриншот выполнения:</h3>
+                    <img src="screenshots/three.png" alt="Запрос 3 - HEAD file.tar.gz" onclick="openModal(this.src)">
+                </div>
+            </div>
+        </div>
+        
+        <!-- Задание 4 -->
+        <div class="task-card">
+            <div class="task-header" onclick="toggleTask(4)">
+                <h2>
+                    <span class="task-number">4</span>
+                    Определить медиатип ресурса /image.png
+                    <span class="result-badge">✅ image/png</span>
+                </h2>
+                <span class="toggle-icon" id="icon4">▼</span>
+            </div>
+            <div class="task-content" id="content4">
+                <div class="explanation">
+                    <h3>📖 Что нужно сделать?</h3>
+                    <p>Использовать метод <strong>HEAD</strong> для получения только заголовков. Медиатип (MIME-type) определяется из заголовка Content-Type.</p>
+                </div>
+                
+                <div class="request-box">
+                    <strong>🔧 Отправленный запрос:</strong><br>
+                    HEAD /task2/files/image.png HTTP/1.1<br>
+                    Host: u82591.kubsu-dev.ru<br>
+                    Connection: close<br>
+                    <br>
+                    (пустая строка в конце)
+                </div>
+                
+                <div class="response-info">
+                    <h4>📌 Полученный результат:</h4>
+                    <ul>
+                        <li><strong>HTTP/1.1 200 OK</strong> — файл существует</li>
+                        <li><strong>Content-Type: image/png</strong> — медиатип PNG изображения</li>
+                        <li><strong>Content-Length: 11</strong> — размер файла (тестовый)</li>
+                    </ul>
+                </div>
+                
+                <div class="screenshot">
+                    <h3>📸 Скриншот выполнения:</h3>
+                    <img src="screenshots/Four.png" alt="Запрос 4 - HEAD image.png" onclick="openModal(this.src)">
+                </div>
+            </div>
+        </div>
+        
+        <!-- Задание 5 -->
+        <div class="task-card">
+            <div class="task-header" onclick="toggleTask(5)">
+                <h2>
+                    <span class="task-number">5</span>
+                    Отправить комментарий на сервер по адресу /index.php
+                    <span class="result-badge">✅ POST успешен</span>
+                </h2>
+                <span class="toggle-icon" id="icon5">▼</span>
+            </div>
+            <div class="task-content" id="content5">
+                <div class="explanation">
+                    <h3>📖 Что нужно сделать?</h3>
+                    <p>Отправить <strong>POST-запрос</strong> с данными комментария. POST передает данные в теле запроса, что требует указания заголовков Content-Type и Content-Length.</p>
+                </div>
+                
+                <div class="request-box">
+                    <strong>🔧 Отправленный запрос:</strong><br>
+                    POST /task2/files/index.php HTTP/1.1<br>
+                    Host: u82591.kubsu-dev.ru<br>
+                    Content-Type: application/x-www-form-urlencoded<br>
+                    Content-Length: 21<br>
+                    Connection: close<br>
+                    <br>
+                    comment=test_comment
+                </div>
+                
+                <div class="response-info">
+                    <h4>📌 Полученный результат:</h4>
+                    <ul>
+                        <li><strong>HTTP/1.1 200 OK</strong> — запрос успешно обработан</li>
+                        <li><strong>Content-Length: 52</strong> — размер ответа</li>
+                        <li>Сервер обработал комментарий (ответ должен содержать "Получен комментарий")</li>
+                    </ul>
+                </div>
+                
+                <div class="screenshot">
+                    <h3>📸 Скриншот выполнения:</h3>
+                    <img src="screenshots/five.png" alt="Запрос 5 - POST comment" onclick="openModal(this.src)">
+                </div>
+            </div>
+        </div>
+        
+        <!-- Задание 6 -->
+        <div class="task-card">
+            <div class="task-header" onclick="toggleTask(6)">
+                <h2>
+                    <span class="task-number">6</span>
+                    Получить первые 100 байт файла /file.tar.gz
+                    <span class="result-badge">✅ 206 Partial Content</span>
+                </h2>
+                <span class="toggle-icon" id="icon6">▼</span>
+            </div>
+            <div class="task-content" id="content6">
+                <div class="explanation">
+                    <h3>📖 Что нужно сделать?</h3>
+                    <p>Использовать заголовок <strong>Range</strong> для частичной загрузки файла. Это позволяет получить только указанный диапазон байт, не скачивая весь файл.</p>
+                </div>
+                
+                <div class="request-box">
+                    <strong>🔧 Отправленный запрос:</strong><br>
+                    GET /task2/files/file.tar.gz HTTP/1.1<br>
+                    Host: u82591.kubsu-dev.ru<br>
+                    Range: bytes=0-99<br>
+                    Connection: close<br>
+                    <br>
+                    (пустая строка в конце)
+                </div>
+                
+                <div class="response-info">
+                    <h4>📌 Полученный результат:</h4>
+                    <ul>
+                        <li><strong>HTTP/1.1 206 Partial Content</strong> — частичное содержимое</li>
+                        <li><strong>Content-Range: bytes 0-99/1048576</strong> — запрошены байты 0-99 из 1,048,576</li>
+                        <li><strong>Content-Length: 100</strong> — получено 100 байт</li>
+                        <li>Тело ответа содержит первые 100 байт файла</li>
+                    </ul>
+                </div>
+                
+                <div class="screenshot">
+                    <h3>📸 Скриншот выполнения:</h3>
+                    <img src="screenshots/six.png" alt="Запрос 6 - Range bytes 0-99" onclick="openModal(this.src)">
+                </div>
+            </div>
+        </div>
+        
+        <!-- Задание 7 -->
+        <div class="task-card">
+            <div class="task-header" onclick="toggleTask(7)">
+                <h2>
+                    <span class="task-number">7</span>
+                    Определить кодировку ресурса /index.php
+                    <span class="result-badge">✅ UTF-8</span>
+                </h2>
+                <span class="toggle-icon" id="icon7">▼</span>
+            </div>
+            <div class="task-content" id="content7">
+                <div class="explanation">
+                    <h3>📖 Что нужно сделать?</h3>
+                    <p>Использовать метод <strong>HEAD</strong> для получения заголовков. Кодировка указывается в заголовке Content-Type после параметра <strong>charset</strong>.</p>
+                </div>
+                
+                <div class="request-box">
+                    <strong>🔧 Отправленный запрос:</strong><br>
+                    HEAD /task2/files/index.php HTTP/1.1<br>
+                    Host: u82591.kubsu-dev.ru<br>
+                    Connection: close<br>
+                    <br>
+                    (пустая строка в конце)
+                </div>
+                
+                <div class="response-info">
+                    <h4>📌 Полученный результат:</h4>
+                    <ul>
+                        <li><strong>HTTP/1.1 200 OK</strong> — файл существует</li>
+                        <li><strong>Content-Type: text/html; charset=UTF-8</strong> — кодировка UTF-8</li>
+                        <li>Это стандартная кодировка для веб-страниц, поддерживающая все символы Юникода</li>
+                    </ul>
+                </div>
+                
+                <div class="screenshot">
+                    <h3>📸 Скриншот выполнения:</h3>
+                    <img src="screenshots/seven.png" alt="Запрос 7 - HEAD index.php charset" onclick="openModal(this.src)">
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>📌 Все запросы выполнены через telnet к серверу localhost (u82591.kubsu-dev.ru)</p>
+            <p>✅ Каждый скриншот показывает отправленный запрос и полученные заголовки ответа</p>
+            <p>📅 Дата выполнения: 22 марта 2026</p>
+        </footer>
+    </div>
+    
+    <!-- Модальное окно для просмотра скриншотов -->
+    <div id="imageModal" style="display:none; position:fixed; z-index:1000; left:0; top:0; width:100%; height:100%; background-color:rgba(0,0,0,0.9); cursor:pointer;" onclick="closeModal()">
+        <img id="modalImage" style="margin: auto; display: block; max-width: 90%; max-height: 90%; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
+    </div>
+    
+    <script>
+        function toggleTask(taskNumber) {
+            const content = document.getElementById(`content${taskNumber}`);
+            const icon = document.getElementById(`icon${taskNumber}`);
+            
+            if (content.classList.contains('active')) {
+                content.classList.remove('active');
+                icon.textContent = '▼';
+            } else {
+                content.classList.add('active');
+                icon.textContent = '▲';
+            }
+        }
+        
+        function openModal(src) {
+            const modal = document.getElementById('imageModal');
+            const modalImg = document.getElementById('modalImage');
+            modal.style.display = 'block';
+            modalImg.src = src;
+        }
+        
+        function closeModal() {
+            document.getElementById('imageModal').style.display = 'none';
+        }
+        
+        // Открываем первый блок по умолчанию
+        toggleTask(1);
+        
+        // Закрытие модального окна по ESC
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeModal();
+            }
+        });
+    </script>
+</body>
+</html>
